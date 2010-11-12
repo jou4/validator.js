@@ -1,0 +1,64 @@
+<html>
+<head>
+  <title>Validator-js sample</title>
+
+  <script language="javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
+  <script language="javascript" src="../jquery-regex.js"></script>
+  <script language="javascript" src="../validator.js"></script>
+  <script type="text/javascript">
+    <!--
+        $(document).ready(function(){
+          Validator.defaultLoad();
+        });
+    // -->
+  </script>
+</head>
+<body>
+  <form>
+    <div>
+      __req:<br />
+      <input type="text" class="__req" />
+    </div>
+    <div>
+      __trim __req:<br />
+      <input type="text" class="__trim __req" />
+    </div>
+    <div>
+      __min_3:<br />
+      <input type="text" class="__min_3" />
+    </div>
+    <div>
+      __numonly:<br />
+      <input type="text" class="__numonly" />
+    </div>
+    <div>
+      __email:<br />
+      <input type="text" class="__email" />
+    </div>
+    <div>
+      __len_3:<br />
+      <input type="text" class="__len_3" />
+    </div>
+    <div>
+      __len_3_5:<br />
+      <input type="text" class="__len_3_5" />
+    </div>
+    <div>
+      __hiragana:<br />
+      <input type="text" class="__hiragana" />
+    </div>
+    <div>
+      __katakana:<br />
+      <input type="text" class="__katakana" />
+    </div>
+    <div>
+      __hankana:<br />
+      <input type="text" class="__hankana" />
+    </div>
+
+    <p>
+      <input type="submit" value="submit" />
+    </p>
+  </form>
+</body>
+</html>
