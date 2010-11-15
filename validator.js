@@ -34,7 +34,7 @@
                 
                 jQuery('.' + consts.ERROR_MSG, this).remove();
                 
-                var check = context.check(this);
+                var check = context.run(this);
                 
                 if( ! check.valid){
                     var err;
@@ -49,7 +49,7 @@
             });
             
         },
-
+        
         makeMessage: function(msg){
             return '<div class="' + consts.ERROR_MSG + '" style="color:red;">' + msg + '<div>';
         },
@@ -111,26 +111,32 @@
             
         },
         
-        check: function(pnl){
-            
+        run: function(pnl){
             var result = {valid:true, errors:[]};
             
             jQuery(':regex(data:' + consts.HAS_VALIDATOR + ', yes)', pnl).each(function(){
-                
-                var as = context.getActions(this);
-                var a, r;
-                for(var i=0,l=as.length; i<l; ++i){
-                    a = as[i];
-                    r = a();
-                    if(r){
-                        result.valid = false;
-                        result.errors.push({target:jQuery(this).get(0), msg:r});
-                    }
+                var errs = context.check(this);
+                if(errs){
+                    result.valid = false;
+                    result.errors = result.errors.concat(errs);
                 }
             });
             
             return result;
-            
+        },
+        
+        check: function(target){
+            var errors = [];
+            var as = context.getActions(target);
+            var a, r;
+            for(var i=0,l=as.length; i<l; ++i){
+                a = as[i];
+                r = a();
+                if(r){
+                    errors.push({target:jQuery(target).get(0), msg:r});
+                }
+            }
+            return (errors.length > 0) ? errors : null;
         },
         
         getActions: function(target){
@@ -165,24 +171,24 @@
     };
     
     context.Messages = {
-        REQUIRED_CHECK:function(){ return 'チェックしてください。'; },
-        REQUIRED_INPUT:function(){ return '入力してください。'; },
-        LENGTH_MIN:function(min){ return min + '文字以上で入力してください。'; },
-        LENGTH_MAX:function(max){ return max + '文字以内で入力してください。'; },
-        LENGTH_RANGE:function(min, max){ return min + '文字以上' + max + '文字以下で入力してください。'; },
-        LENGTH:function(len){ return len + '文字で入力してください。'; },
-        NUMBER_ONLY:function(){ return '半角数字のみで入力してください。'; },
-        NUMBER:function(){ return '数値を入力してください。'; },
-        NUMBER_RANGE:function(min, max){ return min + '以上' + max + '以下の数値を入力してください。'; },
-        ALPHABET:function(){ return 'アルファベットのみで入力してください。'; },
-        HANKAKU:function(){ return '半角文字で入力してください。'; },
-        ZENKAKU:function(){ return '全角文字で入力してください。'; },
-        HIRAGANA:function(){ return 'ひらがなで入力してください。'; },
-        KATAKANA:function(){ return '全角カタカナで入力してください。'; },
-        HANKANA:function(){ return '半角カタカナで入力してください。'; },
-        EMAIL:function(){ return '正しいメールアドレスの形式で入力してください。'; },
-        URL:function(){ return '正しいURLの形式で入力してください。'; },
-        PAIR:function(){ return '入力内容が異なります。'; }
+        REQUIRED_CHECK: function(){ return 'チェックしてください。'; },
+        REQUIRED_INPUT: function(){ return '入力してください。'; },
+        LENGTH_MIN: function(min){ return min + '文字以上で入力してください。'; },
+        LENGTH_MAX: function(max){ return max + '文字以内で入力してください。'; },
+        LENGTH_RANGE: function(min, max){ return min + '文字以上' + max + '文字以下で入力してください。'; },
+        LENGTH: function(len){ return len + '文字で入力してください。'; },
+        NUMBER_ONLY: function(){ return '半角数字のみで入力してください。'; },
+        NUMBER: function(){ return '数値を入力してください。'; },
+        NUMBER_RANGE: function(min, max){ return min + '以上' + max + '以下の数値を入力してください。'; },
+        ALPHABET: function(){ return 'アルファベットのみで入力してください。'; },
+        HANKAKU: function(){ return '半角文字で入力してください。'; },
+        ZENKAKU: function(){ return '全角文字で入力してください。'; },
+        HIRAGANA: function(){ return 'ひらがなで入力してください。'; },
+        KATAKANA: function(){ return '全角カタカナで入力してください。'; },
+        HANKANA: function(){ return '半角カタカナで入力してください。'; },
+        EMAIL: function(){ return '正しいメールアドレスの形式で入力してください。'; },
+        URL: function(){ return '正しいURLの形式で入力してください。'; },
+        PAIR: function(){ return '入力内容が異なります。'; }
     };
     
     context.Actions = {
