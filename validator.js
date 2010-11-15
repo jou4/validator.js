@@ -79,7 +79,7 @@
                     }else if(e.match(/^__len_([0-9]+)_?([0-9]+)?$/)){
                         actions.len(target, parseInt(RegExp.$1), (RegExp.$2) ? parseInt(RegExp.$2) : 0);
                     }else if(e.match(/^__range_([0-9]+)_([0-9]+)$/)){
-                        actions.len(target, parseInt(RegExp.$1), parseInt(RegExp.$2));
+                        actions.range(target, parseInt(RegExp.$1), parseInt(RegExp.$2));
                     }else if(e === '__numonly'){
                         actions.numonly(target);
                     }else if(e === '__num'){
