@@ -84,8 +84,12 @@
                         actions.numonly(target);
                     }else if(e === '__num'){
                         actions.num(target);
+                    }else if(e === '__int'){
+                        actions.int(target);
                     }else if(e === '__alpha'){
                         actions.alpha(target);
+                    }else if(e === '__alphadash'){
+                        actions.alphadash(target);
                     }else if(e === '__hankaku'){
                         actions.hankaku(target);
                     }else if(e === '__zenkaku'){
@@ -179,8 +183,10 @@
         LENGTH: function(len){ return len + '文字で入力してください。'; },
         NUMBER_ONLY: function(){ return '半角数字のみで入力してください。'; },
         NUMBER: function(){ return '数値を入力してください。'; },
+        INTEGER: function(){ return '整数を入力してください。'; },
         NUMBER_RANGE: function(min, max){ return min + '以上' + max + '以下の数値を入力してください。'; },
         ALPHABET: function(){ return 'アルファベットのみで入力してください。'; },
+        ALPHABET_DASH: function(){ return '半角英数字およびハイフン・アンダースコアのみで入力してください。'; },
         HANKAKU: function(){ return '半角文字で入力してください。'; },
         ZENKAKU: function(){ return '全角文字で入力してください。'; },
         HIRAGANA: function(){ return 'ひらがなで入力してください。'; },
@@ -288,6 +294,13 @@
                     , context.Messages.NUMBER());
         },
         
+        int: function(target){
+            context.setRegexpRule(
+                target
+                , /^[\-+]?[0-9]+$/
+                    , context.Messages.INTEGER());
+        },
+        
         range: function(target, min, max){
             context.addAction(target, function(){
                 var val = _getValue(target);
@@ -309,6 +322,13 @@
                 target
                 , /^[a-zA-Z]+$/
                     , context.Messages.ALPHABET());
+        },
+        
+        alphadash: function(target){
+            context.setRegexpRule(
+                target
+                , /^([a-z0-9_\-])+$/i
+                    , context.Messages.ALPHABET_DASH());
         },
         
         hankaku: function(target){
