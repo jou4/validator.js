@@ -175,8 +175,9 @@
     };
     
     context.Messages = {
-        REQUIRED_CHECK: function(){ return 'チェックしてください。'; },
         REQUIRED_INPUT: function(){ return '入力してください。'; },
+        REQUIRED_CHECK: function(){ return 'チェックしてください。'; },
+        REQUIRED_SELECT: function(){ return '選択してください。'; },
         LENGTH_MIN: function(min){ return min + '文字以上で入力してください。'; },
         LENGTH_MAX: function(max){ return max + '文字以内で入力してください。'; },
         LENGTH_RANGE: function(min, max){ return min + '文字以上' + max + '文字以下で入力してください。'; },
@@ -221,6 +222,14 @@
                 context.addAction(target, function(){
                     if( ! jQuery(target).attr('checked')){
                         return context.Messages.REQUIRED_CHECK();
+                    }
+                    return null;
+                });
+            }else if(_isComboBox(target)){
+                context.addAction(target, function(){
+                    var val = _getValue(target);
+                    if(val.length === 0){
+                        return context.Messages.REQUIRED_SELECT();
                     }
                     return null;
                 });
