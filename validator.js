@@ -17,9 +17,23 @@
         },
         _isCheckBox = function(target){
             return ((_tagName(target) === 'input') && (jQuery(target).attr('type') === 'checkbox'));
-            },
+        },
         _isComboBox = function(target){
             return (_tagName(target) === 'select');
+        },
+        _isShow = function(target){
+            var body = document.body;
+            target = jQuery(target).get(0);
+            while(target && target !== body){
+                if(jQuery(target).css('display') === 'none'){
+                    return false;
+                }
+                target = target.parentNode;
+            }
+            return true;
+        },
+        _isHide = function(target){
+            return ( ! _isShow(target));
         };
     
     
@@ -119,10 +133,12 @@
             var result = {valid:true, errors:[]};
             
             jQuery(':regex(data:' + consts.HAS_VALIDATOR + ', yes)', pnl).each(function(){
-                var errs = context.check(this);
-                if(errs){
-                    result.valid = false;
-                    result.errors = result.errors.concat(errs);
+                if(_isShow(this)){
+                    var errs = context.check(this);
+                    if(errs){
+                        result.valid = false;
+                        result.errors = result.errors.concat(errs);
+                    }
                 }
             });
             
