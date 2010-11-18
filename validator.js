@@ -174,6 +174,11 @@
             jQuery(target).data(consts.VALIDATOR, as);
         },
         
+        removeActions: function(target){
+            jQuery(target).data(consts.HAS_VALIDATOR, 'no');
+            jQuery(target).data(consts.VALIDATOR, null);
+        },
+        
         
         setRegexpRule: function(target, regex, msg){
             context.addAction(target, function(){
@@ -244,7 +249,7 @@
             }else if(_isComboBox(target)){
                 context.addAction(target, function(){
                     var val = _getValue(target);
-                    if(val.length === 0){
+                    if( ! val){
                         return context.Messages.REQUIRED_SELECT();
                     }
                     return null;

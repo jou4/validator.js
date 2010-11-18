@@ -1,0 +1,562 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Validator-js test</title>
+    
+    <script language="javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
+    
+    <link rel="stylesheet" href="http://dev.jquery.com/view/trunk/qunit/testsuite.css" type="text/css" />
+    <script type="text/javascript" src="http://dev.jquery.com/view/trunk/qunit/testrunner.js"></script>
+
+    <script type="text/javascript" src="../jquery-regex.js"></script>
+    <script type="text/javascript" src="../validator.js"></script>
+    <script type="text/javascript">
+    $(function(){
+        try {
+            var v = Validator,
+            as = Validator.Actions,
+            check = function(target){ return null == v.check(target); },
+            pnl = $('<div id="_test"></div>').appendTo(document.body),
+            text = $('<input type="text" id="_text" />').appendTo(pnl),
+            text2 = $('<input type="text" id="_text2" />').appendTo(pnl),
+            checkbox = $('<input type="checkbox" id="_checkbox" />').appendTo(pnl),
+            combobox = $('<select id="_combobox"></select>').appendTo(pnl);
+
+            test("Actions - trim", function(){
+
+                v.removeActions(text);
+                text.val(" 　abc 　");
+                as.trim(text, true, false);
+                v.check(text);
+                equals(text.val(), "abc 　", "ltrim");
+
+                v.removeActions(text);
+                text.val(" 　abc 　");
+                as.trim(text, false, true);
+                v.check(text);
+                equals(text.val(), " 　abc", "rtrim");
+
+                v.removeActions(text);
+                text.val(" 　abc 　");
+                as.trim(text, true, true);
+                v.check(text);
+                equals(text.val(), "abc", "trim");
+                
+            });
+            
+            test("Actions - req", function(){
+                
+                v.removeActions(text);
+                as.trim(text, true, true);
+                as.req(text);
+
+                text.val("");
+                ok( ! check(text), "blank");
+
+                text.val("abc");
+                ok(check(text), "not blank");
+
+                text.val("  　　");
+                ok( ! check(text), "blank by trim");
+                
+            });
+
+            test("Actions - req(Not TextBox)", function(){
+
+                v.removeActions(checkbox);
+                as.req(checkbox);
+
+                checkbox.attr("checked", false);
+                ok( ! check(checkbox), "not checked");
+                
+                checkbox.attr("checked", true);
+                ok(check(checkbox), "checked");
+
+                v.removeActions(combobox);
+                as.req(combobox);
+                combobox.empty();
+
+                ok( ! check(combobox), "no items");
+
+                combobox.append($('<option value="">Not selected</option>'));
+                combobox.val("");
+
+                ok( ! check(combobox), "not selected");
+                
+                combobox.append($('<option value="1">Selected</option>'));
+                combobox.val(1);
+
+                ok(check(combobox), "selected");
+                
+            });
+
+            test("Actions - min", function(){
+
+                v.removeActions(text);
+                as.min(text, 3);
+
+                text.val("ab");
+                ok( ! check(text), "too little");
+
+                text.val("abc");
+                ok(check(text), "exact length");
+
+                text.val("abcd");
+                ok(check(text), "too many");
+                
+            });
+            
+            test("Actions - max", function(){
+
+                v.removeActions(text);
+                as.max(text, 3);
+
+                text.val("ab");
+                ok(check(text), "too little");
+
+                text.val("abc");
+                ok(check(text), "exact length");
+
+                text.val("abcd");
+                ok( ! check(text), "too many");
+                
+            });
+            
+            test("Actions - len", function(){
+
+                v.removeActions(text);
+                as.len(text, 3);
+
+                text.val("ab");
+                ok( ! check(text), "too little");
+
+                text.val("abc");
+                ok(check(text), "exact length");
+
+                text.val("abcd");
+                ok( ! check(text), "too many");
+
+
+                v.removeActions(text);
+                as.len(text, 3, 5);
+                text.val("ab");
+                ok( ! check(text), "too little");
+
+                text.val("abc");
+                ok(check(text), "equal lower bound");
+
+                text.val("abcd");
+                ok(check(text), "within the range");
+
+                text.val("abcde");
+                ok(check(text), "equal upper bound");
+
+                text.val("abcdef");
+                ok( ! check(text), "too many");
+                
+            });
+
+            test("Actions - numonly", function(){
+                
+                v.removeActions(text);
+                as.numonly(text);
+
+                text.val("");
+                ok(check(text), "blank");
+
+                text.val("abc123");
+                ok( ! check(text), "not numonly");
+
+                text.val("123");
+                ok(check(text), "numonly");
+
+                text.val("-123");
+                ok( ! check(text), "include minus sign");
+
+                text.val("+123");
+                ok( ! check(text), "include plus sign");
+
+                text.val("1.0");
+                ok( ! check(text), "float");
+                
+            });
+
+            test("Actions - num", function(){
+
+                v.removeActions(text);
+                as.num(text);
+
+                text.val("");
+                ok(check(text), "blank");
+
+                text.val("abc123");
+                ok( ! check(text), "not numonly");
+
+                text.val("123");
+                ok(check(text), "numonly");
+
+                text.val("-123");
+                ok(check(text), "include minus sign");
+
+                text.val("+123");
+                ok(check(text), "include plus sign");
+
+                text.val("1.0");
+                ok(check(text), "float");
+
+                text.val("1.0.0");
+                ok( ! check(text), "version number");
+                
+            });
+
+            test("Actions - int", function(){
+
+                v.removeActions(text);
+                as.int(text);
+
+                text.val("");
+                ok(check(text), "blank");
+
+                text.val("abc123");
+                ok( ! check(text), "not numonly");
+
+                text.val("123");
+                ok(check(text), "numonly");
+
+                text.val("-123");
+                ok(check(text), "include minus sign");
+
+                text.val("+123");
+                ok(check(text), "include plus sign");
+
+                text.val("1.0");
+                ok( ! check(text), "float");
+
+            });
+
+            test("Actions - range", function(){
+
+                v.removeActions(text);
+                as.range(text, 3, 5);
+
+                text.val("");
+                ok(check(text), "blank");
+
+                text.val("abc");
+                ok(check(text), "not num");
+
+                text.val("2");
+                ok( ! check(text), "too small");
+
+                text.val("3");
+                ok(check(text), "equal lower bound");
+
+                text.val("4");
+                ok(check(text), "within range");
+
+                text.val("5");
+                ok(check(text), "equal upper bound");
+
+                text.val("6");
+                ok( ! check(text), "too large");
+                
+            });
+
+            test("Actions - alpha", function(){
+
+                v.removeActions(text);
+                as.alpha(text);
+
+                text.val("");
+                ok(check(text), "blank");
+
+                text.val("abcABC");
+                ok(check(text), "alphabet");
+
+                text.val("abc123");
+                ok( ! check(text), "include number");
+
+                text.val("abc-");
+                ok( ! check(text), "include sign");
+
+                text.val("abcあ");
+                ok( ! check(text), "include hiragana");
+                
+            });
+            
+            test("Actions - alphadash", function(){
+
+                v.removeActions(text);
+                as.alphadash(text);
+
+                text.val("");
+                ok(check(text), "blank");
+
+                text.val("abcABC");
+                ok(check(text), "alphabet");
+
+                text.val("abc123");
+                ok(check(text), "include number");
+
+                text.val("abc-");
+                ok(check(text), "include hyphen sign");
+
+                text.val("abc_");
+                ok(check(text), "include underscore sign");
+
+                text.val("abcあ");
+                ok( ! check(text), "include hiragana");
+                
+            });
+            
+            test("Actions - hankaku", function(){
+
+                v.removeActions(text);
+                as.hankaku(text);
+
+                text.val("");
+                ok(check(text), "blank");
+
+                text.val("abcABC");
+                ok(check(text), "alphabet");
+
+                text.val("abc123");
+                ok(check(text), "include number");
+
+                text.val("abced@sample.com");
+                ok(check(text), "mailaddress");
+                
+                text.val("abc-");
+                ok(check(text), "include hyphen sign");
+
+                text.val("abc_");
+                ok(check(text), "include underscore sign");
+
+                text.val("abcあ");
+                ok( ! check(text), "include hiragana");
+
+                text.val("abcｱ");
+                ok( ! check(text), "include hankaku-kana");
+                
+            });
+            
+            test("Actions - zenkaku", function(){
+
+                v.removeActions(text);
+                as.zenkaku(text);
+
+                text.val("");
+                ok(check(text), "blank");
+
+                text.val("あいうabcABC");
+                ok( ! check(text), "include alphabet");
+
+                text.val("あいう123");
+                ok( ! check(text), "include number");
+
+                text.val("abced@sample.com");
+                ok( ! check(text), "mailaddress");
+                
+                text.val("あいう-");
+                ok( ! check(text), "include hyphen sign");
+
+                text.val("あいう_");
+                ok( ! check(text), "include underscore sign");
+
+                text.val("あいうアイウ");
+                ok(check(text), "zenkaku");
+
+                text.val("あいうｱ");
+                ok( ! check(text), "include hankaku-kana");
+                
+            });
+            
+            test("Actions - hiragana", function(){
+
+                v.removeActions(text);
+                as.hiragana(text);
+
+                text.val("");
+                ok(check(text), "blank");
+
+                text.val("あいうabcABC");
+                ok( ! check(text), "include alphabet");
+
+                text.val("あいう123");
+                ok( ! check(text), "include number");
+
+                text.val("abced@sample.com");
+                ok( ! check(text), "mailaddress");
+                
+                text.val("あいう-");
+                ok( ! check(text), "include hyphen sign");
+
+                text.val("あいう_");
+                ok( ! check(text), "include underscore sign");
+
+                text.val("あいうアイウ");
+                ok( ! check(text), "include katakana");
+
+                text.val("あいうｱ");
+                ok( ! check(text), "include hankaku-kana");
+
+                text.val("吾輩は猫であーる。");
+                ok( ! check(text), "include kanji");
+
+                text.val("あー、い～う。");
+                ok(check(text), "hiragana");
+                
+            });
+            
+            test("Actions - katakana", function(){
+
+                v.removeActions(text);
+                as.katakana(text);
+
+                text.val("");
+                ok(check(text), "blank");
+
+                text.val("アイウabcABC");
+                ok( ! check(text), "include alphabet");
+
+                text.val("アイウ123");
+                ok( ! check(text), "include number");
+
+                text.val("abced@sample.com");
+                ok( ! check(text), "mailaddress");
+                
+                text.val("アイウ-");
+                ok( ! check(text), "include hyphen sign");
+
+                text.val("アイウ_");
+                ok( ! check(text), "include underscore sign");
+
+                text.val("あいうアイウ");
+                ok( ! check(text), "include katakana");
+
+                text.val("アイウｱ");
+                ok( ! check(text), "include hankaku-kana");
+
+                text.val("吾輩ハ猫デアール。");
+                ok( ! check(text), "include kanji");
+
+                text.val("アー、イ～ウ。");
+                ok(check(text), "katakana");
+                
+            });
+            
+            test("Actions - hankana", function(){
+
+                v.removeActions(text);
+                as.hankana(text);
+
+                text.val("");
+                ok(check(text), "blank");
+
+                text.val("ｱｲｳabcABC");
+                ok( ! check(text), "include alphabet");
+                
+                text.val("ｱｲｳ123");
+                ok( ! check(text), "include number");
+                
+                text.val("abced@sample.com");
+                ok( ! check(text), "mailaddress");
+                
+                text.val("ｱｲｳ-");
+                ok( ! check(text), "include hyphen sign");
+                
+                text.val("ｱｲｳ_");
+                ok( ! check(text), "include underscore sign");
+                
+                text.val("ｱｲｳあいう");
+                ok( ! check(text), "include hiragana");
+                
+                text.val("ｱｲｳアイウ");
+                ok( ! check(text), "include katakana");
+
+                text.val("吾輩ﾊ猫ﾃﾞｱｰﾙ｡");
+                ok( ! check(text), "include kanji");
+
+                text.val("ﾜｶﾞﾊｲﾊ､ﾈｺﾃﾞｱｰﾙ｡");
+                ok(check(text), "hankana");
+                
+            });
+
+            test("Actions - email", function(){
+
+                v.removeActions(text);
+                as.email(text);
+
+                text.val("");
+                ok(check(text), "blank");
+
+                text.val("abcde.fg@sample.com");
+                ok(check(text), "mailaddress");
+
+                text.val("abcde.fg");
+                ok( ! check(text), "not mailaddress");
+                
+            });
+
+            test("Actions - url", function(){
+
+                v.removeActions(text);
+                as.url(text);
+
+                text.val("");
+                ok(check(text), "blank");
+
+                text.val("http://sample.com/index/");
+                ok(check(text), "http");
+
+                text.val("https://sample.com/index/");
+                ok(check(text), "https");
+
+                text.val("http:/sample.com/index/");
+                ok( ! check(text), "not url");
+                
+            });
+
+            test("Actions - pair", function(){
+
+                v.removeActions(text);
+                v.removeActions(text2);
+                as.pair(text, text2);
+
+                text.val("");
+                text2.val("");
+                ok(check(text2), "blank - blank");
+
+                text.val("");
+                text2.val("abc");
+                ok(check(text2), "blank - not blank");
+
+                text.val("abc");
+                text2.val("");
+                ok(check(text2), "not blank - blank");
+
+                text.val("abc");
+                text2.val("abcd");
+                ok( ! check(text2), "different");
+
+                text.val("abc");
+                text2.val("abc");
+                ok(check(text2), "match");
+                
+            });
+            pnl.remove();
+            
+        }
+        catch (e) {
+        }
+    });
+    </script>
+  </head>
+  <body>
+    <h1>QUnit example</h1>
+    <h2 id="banner"></h2>
+    <h2 id="userAgent"></h2>
+    <ol id="tests"></ol>
+    <div id="main"></div>
+  </body>
+</html>
