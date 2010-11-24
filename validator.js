@@ -195,6 +195,8 @@
         
     };
     
+    context.Consts = consts;
+    
     context.Messages = {
         REQUIRED_INPUT: function(){ return '入力してください。'; },
         REQUIRED_CHECK: function(){ return 'チェックしてください。'; },
@@ -399,7 +401,7 @@
         email: function(target){
             context.setRegexpRule(
                 target
-                , /^[^\@]+?@[A-Za-z0-9_\.\-]+\.+[A-Za-z\.\-\_]+$/
+                , /^[a-z0-9\+_\-\.]+@([a-z0-9\-]+\.)+[a-z]{2,6}$/i
                     , context.Messages.EMAIL());
         },
         
