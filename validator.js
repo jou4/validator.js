@@ -65,7 +65,7 @@
         },
         
         makeMessage: function(msg){
-            return '<div class="' + consts.ERROR_MSG + '" style="color:red;">' + msg + '</div>';
+            return '<div class="' + consts.ERROR_MSG + '">' + msg + '</div>';
         },
         
         bind: function(pnl){
