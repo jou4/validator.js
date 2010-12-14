@@ -56,6 +56,8 @@
                         err = check.errors[i];
                         jQuery(err.target).parent().append(context.makeMessage(err.msg));
                     }
+                    
+                    jQuery(check.errors[0].target).focus();
                 }
                 
                 return check.valid;
