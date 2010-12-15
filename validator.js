@@ -1,11 +1,18 @@
 ﻿var Validator = (function(){
 
-    var context = {},
-        consts = {
+    var extend = function(a, b){
+            for(var n in b){
+                a[n] = b[n]
+            }
+            return a;
+        },
+        context = {},
+        consts = context.Consts = {
             VALIDATOR:'validator',
             HAS_VALIDATOR:'hasValidator',
             ERROR_MSG:'__form_error'
         },
+        rules = context.Rules = [],
         _getValue = function(target){
             return jQuery(target).val();
         },
@@ -37,7 +44,7 @@
         };
     
     
-    context = {
+    extend(context, {
         
         defaultLoad: function(pnl){
             
@@ -70,65 +77,25 @@
             return '<div class="' + consts.ERROR_MSG + '">' + msg + '</div>';
         },
         
+        addRule: function(regex, parser){
+            context.Rules.push({regex: regex, parser: parser});
+        },
+        
         bind: function(pnl){
-            
-            var actions = context.Actions;
-            
             jQuery(':regex(class, ^__.+)', pnl).each(function(){
                 
                 var target = jQuery(this).get(0);
                 
                 jQuery.each(jQuery(target).attr('class').split(/\s+/), function(_, e){
-                    
-                    if(e === '__trim'){
-                        actions.trim(target, true, true);
-                    }else if(e === '__ltrim'){
-                        actions.trim(target, true, false);
-                    }else if(e === '__rtrim'){
-                        actions.trim(target, false, true);
-                    }else if(e === '__req'){
-                        actions.req(target);
-                    }else if(e.match(/^__min_([0-9]+)$/)){
-                        actions.min(target, parseInt(RegExp.$1));
-                    }else if(e.match(/^__max_([0-9]+)$/)){
-                        actions.max(target, parseInt(RegExp.$1));
-                    }else if(e.match(/^__len_([0-9]+)_?([0-9]+)?$/)){
-                        actions.len(target, parseInt(RegExp.$1), (RegExp.$2) ? parseInt(RegExp.$2) : 0);
-                    }else if(e.match(/^__range_([0-9]+)_([0-9]+)$/)){
-                        actions.range(target, parseInt(RegExp.$1), parseInt(RegExp.$2));
-                    }else if(e === '__numonly'){
-                        actions.numonly(target);
-                    }else if(e === '__num'){
-                        actions.num(target);
-                    }else if(e === '__int'){
-                        actions.int(target);
-                    }else if(e === '__alpha'){
-                        actions.alpha(target);
-                    }else if(e === '__alphadash'){
-                        actions.alphadash(target);
-                    }else if(e === '__hankaku'){
-                        actions.hankaku(target);
-                    }else if(e === '__zenkaku'){
-                        actions.zenkaku(target);
-                    }else if(e === '__hiragana'){
-                        actions.hiragana(target);
-                    }else if(e === '__katakana'){
-                        actions.katakana(target);
-                    }else if(e === '__hankana'){
-                        actions.hankana(target);
-                    }else if(e === '__email'){
-                        actions.email(target);
-                    }else if(e === '__url'){
-                        actions.url(target);
-                    }else if(e.match(/^__pair_([0-9a-zA-Z_\-]+)$/)){
-                        var key = RegExp.$1;
-                        actions.pair(target, jQuery('.__paircopy_' + key).get(0));
+                    for(var i = 0, l = rules.length; i < l; ++i){
+                        if(e.match(rules[i].regex)){
+                            rules[i].parser(target, e);
+                            break;
+                        }
                     }
-                    
                 });
                 
             });
-            
         },
         
         run: function(pnl){
@@ -195,9 +162,7 @@
             });
         }
         
-    };
-    
-    context.Consts = consts;
+    });
     
     context.Messages = {
         REQUIRED_INPUT: function(){ return '入力してください。'; },
@@ -223,7 +188,7 @@
         PAIR: function(){ return '入力内容が異なります。'; }
     };
     
-    context.Actions = {
+    var actions = context.Actions = {
         
         trim: function(target, ltrim, rtrim){
             context.addAction(target, function(){
@@ -428,6 +393,115 @@
         }
     
     };
+    
+    
+    // Add default validation rules.
+    context.addRule(new RegExp('^__trim$'),
+        function(target, name){
+            actions.trim(target, true, true);
+        }
+    );
+    context.addRule(new RegExp('^__ltrim$'),
+        function(target, name){
+            actions.trim(target, true, false);
+        }
+    );
+    context.addRule(new RegExp('^__rtrim$'),
+        function(target, name){
+            actions.trim(target, false, true);
+        }
+    );
+    context.addRule(new RegExp('^__req$'),
+        function(target, name){
+            actions.req(target);
+        }
+    );
+    context.addRule(new RegExp('^__min_([0-9]+)$'),
+        function(target, name){
+            actions.min(target, parseInt(RegExp.$1));
+        }
+    );
+    context.addRule(new RegExp('^__max_([0-9]+)$'),
+        function(target, name){
+            actions.max(target, parseInt(RegExp.$1));
+        }
+    );
+    context.addRule(new RegExp('^__len_([0-9]+)_?([0-9]+)?$'),
+        function(target, name){
+            actions.len(target, parseInt(RegExp.$1), (RegExp.$2) ? parseInt(RegExp.$2) : 0);
+        }
+    );
+    context.addRule(new RegExp('^__range_([0-9]+)_([0-9]+)$'),
+        function(target, name){
+            actions.range(target, parseInt(RegExp.$1), parseInt(RegExp.$2));
+        }
+    );
+    context.addRule(new RegExp('^__numonly$'),
+        function(target, name){
+            actions.numonly(target);
+        }
+    );
+    context.addRule(new RegExp('^__num$'),
+        function(target, name){
+            actions.num(target);
+        }
+    );
+    context.addRule(new RegExp('^__int$'),
+        function(target, name){
+            actions.int(target);
+        }
+    );
+    context.addRule(new RegExp('^__alpha$'),
+        function(target, name){
+            actions.alpha(target);
+        }
+    );
+    context.addRule(new RegExp('^__alphadash$'),
+        function(target, name){
+            actions.alphadash(target);
+        }
+    );
+    context.addRule(new RegExp('^__hankaku$'),
+        function(target, name){
+            actions.hankaku(target);
+        }
+    );
+    context.addRule(new RegExp('^__zenkaku$'),
+        function(target, name){
+            actions.zenkaku(target);
+        }
+    );
+    context.addRule(new RegExp('^__hiragana$'),
+        function(target, name){
+            actions.hiragana(target);
+        }
+    );
+    context.addRule(new RegExp('^__katakana$'),
+        function(target, name){
+            actions.katakana(target);
+        }
+    );
+    context.addRule(new RegExp('^__hankana$'),
+        function(target, name){
+            actions.hankana(target);
+        }
+    );
+    context.addRule(new RegExp('^__email$'),
+        function(target, name){
+            actions.email(target);
+        }
+    );
+    context.addRule(new RegExp('^__url$'),
+        function(target, name){
+            actions.url(target);
+        }
+    );
+    context.addRule(new RegExp('^__pair_([0-9a-zA-Z_\-]+)$'),
+        function(target, name){
+            var key = RegExp.$1;
+            actions.pair(target, jQuery('.__paircopy_' + key).get(0));
+        }
+    );
     
     return context;
     

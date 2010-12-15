@@ -17,7 +17,16 @@
   <script type="text/javascript">
     <!--
         $(document).ready(function(){
-          Validator.defaultLoad();
+            Validator.addRule(new RegExp('^__my_check$'), function(target, name){
+                Validator.addAction(target, function(){
+                    var val = $(target).val();
+                    if(val.length === 0){
+                        return "Please input!!";
+                    }
+                    return null;
+                });
+            });
+            Validator.defaultLoad();
         });
     // -->
   </script>
@@ -83,6 +92,11 @@
     <dl style="display:none;">
       <dt>__req:</dt>
       <dd><input id="hideText" type="text" class="__req" /></dd>
+    </dl>
+    
+    <dl>
+      <dt>__my_check:</dt>
+      <dd><input type="text" class="__my_check" /></dd>
     </dl>
     
     <p>
