@@ -64,7 +64,12 @@
                         jQuery(err.target).parent().append(context.makeMessage(err.msg));
                     }
                     
-                    jQuery(check.errors[0].target).focus();
+                    var win = jQuery(window),
+                        target = jQuery(check.errors[0].target),
+                        windowH = win.height(),
+                        targetTop = target.offset().top;
+                    win.scrollTop(Math.max(0, targetTop - windowH / 2));
+                    target.focus();
                 }
                 
                 return check.valid;
